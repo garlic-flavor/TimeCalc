@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <title>TIME Calculator</title>
+    <script src="https://unpkg.com/jquery@3.4.0/dist/jquery.min.js" integrity="sha384-JUMjoW8OzDJw4oFpWIB2Bu/c6768ObEthBMVSiIx4ruBIEdyNSUQAjJNFqT5pnJ6" crossorigin="anonymous"></script>
+    <script src="timecalc.js"></script>
+
     <style>
       textarea {
           width: 100%;
@@ -22,16 +25,35 @@
       }
 
     </style>
-    <script src="https://unpkg.com/jquery@3.4.0/dist/jquery.min.js" integrity="sha384-JUMjoW8OzDJw4oFpWIB2Bu/c6768ObEthBMVSiIx4ruBIEdyNSUQAjJNFqT5pnJ6" crossorigin="anonymous"></script>
-    <script src="timecalc.js"></script>
+
     <body>
       <div class="container">
-        ラベル<br>
-        <textarea id="label"></textarea>
+        経由地<br>
+        <textarea id="label">
+大阪
+京都
+堅田
+
+平
+アラキ峠
+権現山
+子女郎峠
+蓬莱山
+        </textarea>
       </div>
       <div class="container">
         所要時間<br>
-        <textarea id="input"></textarea>
+        <textarea id="input">
+S7:45
+P8:15
+R8:35, S8:50
+
+R9:24, S9:30
+1:00, 10
+50, 30
+1:00, 10
+35
+        </textarea>
       </div>
       <div class="container">
         時間<br>
@@ -40,6 +62,80 @@
       <div class="wide-container">
         CSV<br>
         <textarea id="csv"></textarea>
+      </div>
+      <br clear="left">
+      <div>
+        <h1>TimeCalc</h1>
+        <hr>
+        <p>
+          時間の加算をします。
+        </p>
+        <h2>謝辞</h2>
+        <ul>
+          <li>
+            <a href="https://jquery.com/">jQuery</a>をDOMハンドリングに利用しています。
+          </li>
+          <li>
+            <a href="https://unpkg.com/">unpkg</a>をライブラリホストに利用しています。
+          </li>
+          <li>
+            <a href="https://coffeescript.org/">CoffeeScript</a>で開発しました。
+          </li>
+        </ul>
+        <h2>使い方</h2>
+        <ul>
+          <li>
+            「経由地」欄、「所要時間」欄をそれぞれ入力すると、「時間」欄、「CSV」欄が計算されます。
+          </li>
+          <li>
+            末尾以外の空白行は、空の値をCSVに出力します。
+          </li>
+          <li>
+            「所要時間」欄における「R15:00, 10」は「15時に到着し、10分後に出発する。」を意味します。
+          </li>
+          <li>
+            「所要時間」欄の書式は以下です。
+            <ul>
+              <li>
+                各行は、「経由地」欄の各行に対応しています。
+              </li>
+              <li>
+                時間は24時間表記で書きます。
+              </li>
+              <li>
+                1行に時間を2つまで、「,(カンマ)」区切で書くことができます。
+              </li>
+              <li>
+                1行の1つめは到着時間、2つめは出発時間をそれぞれ表します。
+              </li>
+              <li>
+                1行に1つしか時間を書かなかった場合、通過(到着と出発が同時)であるとみなされます。
+              </li>
+              <li>
+                時間を「S7:45」のように数字以外の文字で始めた時、「7時間45分後」ではなく、「7時45分」を表します。
+              </li>
+              <li>
+                時間の表記で、「35」の様に「:(コロン)」を省略した場合、「00:35」とみなされます。
+              </li>
+              <li>
+                「CSV」欄の時間表記において、
+                <ul>
+                  <li>「R」は到着(Reach)を</li>
+                  <li>「S」は出発(Start)を</li>
+                  <li>「P」は通過(Pass through)を</li>
+                </ul>
+                意味します。
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <h2>ライセンス</h2>
+        <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.ja">CC0</a>
+        <h2>Git Repository</h2>
+        <ul>
+          <li><a href="https://github.com/garlic-flavor/TimeCalc">開発ページ</a></li>
+          <li><a href="https://garlic-flavor.github.io/TimeCalc/">github.ioページ</a></li>
+        </ul>
       </div>
     </body>
 
