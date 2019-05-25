@@ -16,48 +16,36 @@
           width: 150px;
           height: 500px;
           float: left;
+          text-align: center;
       }
 
       div.wide-container {
           width: 300px;
           height: 500px;
           float: left;
+          text-align: center;
       }
 
     </style>
 
     <body>
-      <div class="container">
-        経由地<br>
-        <textarea id="label">
-大阪
-京都
-堅田
-
-平
-アラキ峠
-権現山
-子女郎峠
-蓬莱山
-        </textarea>
-      </div>
-      <div class="container">
-        所要時間<br>
+      <div class="wide-container">
+        入力<br>
         <textarea id="input">
-S7:45
-P8:15
-R8:35, S8:50
+大阪 S7:45
+京都 P8:15
+堅田 R8:35 S8:50
 
-R9:24, S9:30
-1:00, 10
-50, 30
-1:00, 10
-35
+平 R9:24 S9:30
+アラキ峠 1:00 10
+権現山 50 30
+子女郎峠 1:00, 10
+蓬莱山 35
         </textarea>
       </div>
       <div class="container">
         時間<br>
-        <textarea id="output"></textarea>
+        <textarea id="time"></textarea>
       </div>
       <div class="wide-container">
         CSV<br>

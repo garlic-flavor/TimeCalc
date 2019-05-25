@@ -1,69 +1,90 @@
+##==============================================================================
+# Suger for getter and setter method of CoffeeScript.
+Function::property = (prop, desc)->
+    Object.defineProperty @prototype, prop, desc
+
+##==============================================================================
+# 行で分割する。空行は空文字列として残す。
 splitByLine = (s)->
     return s if s.length is 0
     s.replace /\r\n|\n\r|\r/g, '\n'
         .split '\n'
 
-toMinutes = (t)->
-    return 0 if t.length is 0
-    m = t.match(/\d+/g)
-    if not m? then 0 else if m.length is 1 then parseInt(m[0])
-    else
-        parseInt(m[0]) * 60 + parseInt(m[1])
+##==============================================================================
+# 入力1行を表す。
+class Line
+    constructor: (line)->
+        m = reg.exec line
+        if m?
+            @label = line.substring(0, m.index).trim()
+            @time1 = newTime m
+            m = reg.exec line
+            @time2 = newTime m
+            m = reg.exec line while m?
+        else
+            @label = line.trim()
+            @time1 = newTime()
+            @time2 = newTime()
+    toLine: (abs, total)->
+        if @time1.zero
+            t1 = ''
+            t2 = ''
+        else if @time2.zero
+            {total, text: t1} = @time1.addTo abs, total
+            t2 = ''
+        else
+            {total, text: t1} = @time1.addTo 'R', total
+            {total, text: t2} = @time2.addTo 'S', total
+        return
+            total: total
+            time: "#{t1}, #{t2}"
+            csv: "\"#{@label}\", \"#{t1}\", \"#{t2}\""
 
-fromMinutes = (m)->
-    ("00" +  Math.floor(m/60)).slice(-2) + ":" + ("00" + m%60).slice(-2)
-isAbsolute = (t)-> t.trim().match /^[^\d]/
+    reg = /\b([a-zA-Z]?)(\d+)(:)?(\d{1,2})?/g
+    newTime = (m)->
+        absolute = if m? and m[1]? then m[1] else ''
+        minutes = if m? and m[2]? then parseInt(m[2]) else 0
+        minutes *= 60 if m? and m[3]?
+        minutes += parseInt(m[4]) if m? and m[4]?
+        new Time absolute, minutes
 
+##==============================================================================
+# 入力のうち、時間部分を表す。
+class Time
+    constructor: (@absolute, @minutes)->
+    @property 'zero',
+        get: -> @minutes is 0
+    addTo: (abs, total)->
+        if not not @absolute
+            abs = @absolute
+            total = @minutes
+        else
+            total += @minutes
+        return
+            total: total
+            text: fromM abs, total
+
+    fromM = (abs, m)-> "#{abs}#{z(Math.floor(m/60))}:#{z(m%60)}"
+    z = (m)-> ("00" + m).slice -2
+
+################################################################################
+# jQuery 開始
 $ ->
     $input = $ "#input"
-    $output = $ "#output"
-    $label = $ "#label"
+    $time = $ "#time"
     $csv = $ "#csv"
 
-    $input.bind "input", (e)->
-        wholeInMinutes = 0
-        outtext = []
-        csvtext = []
-        labels = splitByLine $label.val().trimEnd()
-        for line, linenum in splitByLine ($ @).val().trimEnd()
-            outline = []
-            absStr = ""
-            if line.length is 0
-                outtext.push ""
-                csvtext.push '"' + labels[linenum] + '", "", ""'
-                continue
-            for time in line.split(',')
-                m = toMinutes time
-                absStr = isAbsolute time
-                if absStr
-                    wholeInMinutes = m
-                else
-                    wholeInMinutes += m
-                outline.push fromMinutes wholeInMinutes
-            outtext.push outline.join ', '
+    $input.on "input", (e)->
+        total = 0
+        timebuf = []
+        csvbuf = []
+        lines = splitByLine ($ @).val().trimEnd()
+        for line, linnum in lines
+            {total, time, csv} = (new Line line).toLine (if linnum+1 < lines.length then 'P' else 'R'), total
+            timebuf.push time
+            csvbuf.push csv
 
-            csvline = []
-            csvline.push '"' + labels[linenum] + '"'
-            if outline.length is 0
-                csvline.push '""'
-                csvline.push '""'
-            else if outline.length is 1
-                head = (if absStr then absStr[0].toUpperCase() else 'P')
+        $time.val timebuf.join '\n'
+        $csv.val csvbuf.join '\n'
 
-                if labels.length <= linenum + 1 or head is 'R'
-                    csvline.push '"R' + outline[0] + '"'
-                    csvline.push '""'
-                else if head is 'S'
-                    csvline.push '""'
-                    csvline.push '"S' + outline[0] + '"'
-                else
-                    csvline.push '"P' + outline[0] + '"'
-                    csvline.push '""'
-            else
-                csvline.push '"R' + outline[0] + '"'
-                csvline.push '"S' + outline[1] + '"'
-
-            csvtext.push csvline.join ', '
-
-        $output.val outtext.join '\n'
-        $csv.val csvtext.join '\n'
+    $input.trigger "input"
